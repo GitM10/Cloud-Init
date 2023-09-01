@@ -1,0 +1,29 @@
+#cloud-config
+
+# Set the hostname for the instance
+hostname: {name}%
+
+# Update and upgrade packages on the system
+package_update: true
+package_upgrade: true
+
+# Install additional packages
+packages:
+  - htop
+  - vim
+  - nano
+  - net-tools
+
+# Commands to run on first boot
+runcmd:
+  # Resize the root partition
+  - growpart /dev/xvda 3
+  
+  # Extend the logical volume to use all available space
+  - lvextend -r -l +100%FREE /dev/mapper/ubuntu--vg-ubuntu--lv
+  
+  # Resize the filesystem on the logical volume
+  - resize2fs /dev/mapper/ubuntu--vg-ubuntu--lv
+
+  # Log the completion of the commands
+  - echo "Cloud-init runcmd completed" >> /var/log/cloud-init.log
